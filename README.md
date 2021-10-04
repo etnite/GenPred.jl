@@ -1,0 +1,6 @@
+# GenPred
+
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://etnite.github.io/GenPred.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://etnite.github.io/GenPred.jl/dev)
+[![Build Status](https://github.com/etnite/GenPred.jl/workflows/CI/badge.svg)](https://github.com/etnite/GenPred.jl/actions)
+[![Coverage](https://codecov.io/gh/etnite/GenPred.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/etnite/GenPred.jl)

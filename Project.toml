@@ -3,6 +3,9 @@ uuid = "18853147-a48b-4210-b87c-350c5f2dc54e"
 authors = ["Brian Ward <brian@brianpward.net>"]
 version = "0.1.0"
 
+[deps]
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+
 [compat]
 julia = "1.6"
 

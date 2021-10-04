@@ -2,3 +2,5 @@
 *.jl.cov
 *.jl.mem
 /docs/build/
+pkg_template.jl
+*.DS_Store

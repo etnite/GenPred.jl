@@ -1,5 +1,5 @@
 
-@doc doc"""
+"""
 Perform simple imputation of missing SNP data
 
 This function performs simple, non-positional imputation of missing data in a
@@ -28,10 +28,10 @@ function simple_impute(snp_mat::Matrix{AbstractFloat}, method::String)
     if method == "mean"
         println("Imputing missing data for each SNP with mean of non-missing calls")
         fill_func = function(x); mean(snp_mat[:, i][.!isnan.(snp_mat[:, i])]); end
-    else if method == "median"
+    elseif method == "median"
         println("Imputing missing data for each SNP with median of non-missing calls")
         fill_func = function(x); median(snp_mat[:, i][.!isnan.(snp_mat[:, i])]); end
-    else if method == "major"
+    elseif method == "major"
         println("Imputing missing data for each SNP with major allele")
         fill_func = function(x); return(0.); end
     else

@@ -2,9 +2,9 @@ module GenPred
 
 # Write your package code here.
 using LinearAlgebra
+using Statistics
 
 using Optim
-using Statistics
 
 export impute
 

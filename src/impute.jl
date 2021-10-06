@@ -1,6 +1,13 @@
 
 """
-Perform simple imputation of missing SNP data
+    simple_imp(snp_mat; method = "major")
+
+Return a copy of an input matrix of minor-allele dosage SNP data where all
+missing data (NaN) for each SNP has been imputed with either:
+
+- The mean value of the SNP
+- The median value of the SNP
+- The major allele
 
 This function performs simple, non-positional imputation of missing data in a
 SNP matrix. Note that imputation in this sense only refers to the estimation of
@@ -9,43 +16,78 @@ ungenotyped markers from a reference panel. In many cases a more advanced imputa
 method taking biological information into account might be preferred, such as
 Beagle, MaCH, etc.
 
-##### Arguments
+# Arguments
 
-- snp_mat: A matrix of floats in minor-allele dosage format (i.e. 0 = homozygous
+- `snp_mat::Matrix{Float64}`: A matrix of SNP data in minor-allele dosage format (i.e. 0 = homozygous
     major allele, 2 = homozygous minor allele, and 1 = heterozygous) with samples
-    in rows, and SNPs in columns. Missing data within this matrix should be
-    identified with NaN, rather than the missing type
-- method: String of either 'mean', 'median', or 'major' specifying what value
+    in rows, and SNPs in columns. Note that minor-allele dosage format is only
+    well-definedfor biallelic variants. Missing data within this matrix should be
+    identified with `NaN`, rather than `missing`. Since NaN is part of the
+    Float64 type, this matrix does NOT require a Union{Float64, Missing} type
+
+# Keyword arguments
+
+- `method::String=major`: String of either 'mean', 'median', or 'major' specifying what value
     should be used to impute missing values within the SNP matrix
-
-##### Returns
-
-- snp_mat: The input SNP matrix, with missing data imputed
 """
-function simple_impute(snp_mat::Matrix{AbstractFloat}, method::String)
+function simple_imp(snp_mat::Matrix{Float64}; method::String = "major")
 
-    ## Define functions to calculate fill values
-    if method == "mean"
-        println("Imputing missing data for each SNP with mean of non-missing calls")
-        fill_func = function(x); mean(snp_mat[:, i][.!isnan.(snp_mat[:, i])]); end
-    elseif method == "median"
-        println("Imputing missing data for each SNP with median of non-missing calls")
-        fill_func = function(x); median(snp_mat[:, i][.!isnan.(snp_mat[:, i])]); end
-    elseif method == "major"
-        println("Imputing missing data for each SNP with major allele")
-        fill_func = function(x); return(0.); end
-    else
-        error("Please select one of mean, median, or major for method")
+    out_mat = deepcopy(snp_mat)
+
+    ## You can't define a function inside an if/else block because it will be
+    ## limited to that block's scope. What we can do is create a function which
+    ## returns another function based on its input (method)
+    function ff_sel(meth)
+        if meth == "mean"
+            ff = x -> mean(x[.!isnan.(x)])
+        elseif meth == "median"
+            ff = x -> median(x[.!isnan.(x)])
+        elseif meth == "major"
+            ff = x -> 0.
+        else
+            error("Please select one of mean, median, or major for method")
+        end
+    end
+    fill_func = ff_sel(method)
+
+        ## Perform replacement of NaN values, one SNP (column) at a time
+    for i in axes(snp_mat, 2)
+        fill_val = fill_func(out_mat[:, i])
+        out_mat[:, i] = replace(out_mat[:, i], NaN => fill_val)
     end
 
-    ## Perform replacement of NaN values, one SNP (column) at a time
-    for i in axes(snp_mat, 2)
-        if NaN ∈ snp_mat[:, i]
-            fill_val = fill_func(snp_mat[:, i])
-            replace!(snp_mat[:, i], NaN => fill_val)
+    return(out_mat)
+end
+
+
+"""
+    simple_imp!(snp_mat; method = "major")
+
+Identical to simple_imp(), except modifies the input SNP matrix rather than
+returning a copy.
+"""
+function simple_imp!(snp_mat::Matrix{Float64}; method::String = "major")
+
+    ## You can't define a function inside an if/else block because it will be
+    ## limited to that block's scope. What we can do is create a function which
+    ## returns another function based on its input (method)
+    function ff_sel(meth)
+        if meth == "mean"
+            ff = x -> mean(x[.!isnan.(x)])
+        elseif meth == "median"
+            ff = x -> median(x[.!isnan.(x)])
+        elseif meth == "major"
+            ff = x -> 0.
         else
-            continue
+            error("Please select one of mean, median, or major for method")
         end
+    end
+    fill_func = ff_sel(method)
+
+        ## Perform replacement of NaN values, one SNP (column) at a time
+    for i in axes(snp_mat, 2)
+        fill_val = fill_func(snp_mat[:, i])
+        snp_mat[:, i] = replace(snp_mat[:, i], NaN => fill_val)
     end
 
     return(snp_mat)

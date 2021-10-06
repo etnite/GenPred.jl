@@ -6,7 +6,7 @@ using Statistics
 
 using Optim
 
-export impute
+export simple_imp, simple_imp!
 
 include("impute.jl")
 

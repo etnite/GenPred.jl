@@ -63,7 +63,7 @@ end
 """
     simple_imp!(snp_mat; method = "major")
 
-Identical to simple_imp(), except modifies the input SNP matrix rather than
+Identical to `simple_imp()`, except modifies the input SNP matrix rather than
 returning a copy.
 """
 function simple_imp!(snp_mat::Matrix{Float64}; method::String = "major")
@@ -90,5 +90,5 @@ function simple_imp!(snp_mat::Matrix{Float64}; method::String = "major")
         snp_mat[:, i] = replace(snp_mat[:, i], NaN => fill_val)
     end
 
-    return(snp_mat)
+    return snp_mat
 end

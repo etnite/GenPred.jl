@@ -106,8 +106,9 @@ function make_output(;ω, θ, ϕ, df, λ_opt, U, X, y, K, Z, return_SE, return_H
 
     H⁻¹ = U * (U' ./ (ϕ .+ λ_opt))
     W = X' * (H⁻¹ * X)
+
+    ## Calculate fixed effects (BLUEs)
     β = vec((X' * (H⁻¹ * y)) / W)
-    #rownames(beta) = colnames(X)
 
     if isnothing(K)
         KZᵀ = Z'
@@ -115,13 +116,13 @@ function make_output(;ω, θ, ϕ, df, λ_opt, U, X, y, K, Z, return_SE, return_H
         KZᵀ = K * Z'
     end
 
-    ## Generate genotypic BLUPs
+    ## Calculate random effects (BLUPs)
     KZᵀH⁻¹ = KZᵀ * H⁻¹
-    u =  vec(KZᵀH⁻¹ * (y .- (X * β)))   #R: u <- array(KZt.H⁻¹ %*% (y - X %*% β))
+    u =  vec(KZᵀH⁻¹ * (y .- (X * β)))   # in R: u <- array(KZt.H⁻¹ %*% (y - X %*% β))
 
     if return_SE
         W⁻¹ = inv(W)
-        β_SE = vec(sqrt(Vu_opt * W⁻¹[1, 1]))
+        β_SE = sqrt.(Vu_opt .* diag(W⁻¹))
         WW = KZᵀH⁻¹ * KZᵀ'
         WWW = KZᵀH⁻¹ * X
 
@@ -132,6 +133,7 @@ function make_output(;ω, θ, ϕ, df, λ_opt, U, X, y, K, Z, return_SE, return_H
         end
     else
         u_SE = nothing
+        β_SE = nothing
     end
 
     if !return_Hinv; H⁻¹ = nothing; end
@@ -163,7 +165,8 @@ multiple fixed effect levels.
 
 The code for this function is sparsely commented. Unfortunately the original
 R mixed.solve() function code does not contain any comments, and while I understand
-the gist of what it accomplishes, there are some steps I don't fully understand.
+the gist of what is happening in each step, I don't understand the logic behind
+everything.
 
 # Keyword arguments
 

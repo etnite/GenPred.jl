@@ -62,6 +62,6 @@ function vanraden_grm(snp_mat; diag_weight=1e-4, test_posdef::Bool=false)
     if test_posdef
         return (GRM = GRM, posdef = isposdef(GRM))
     else
-        return (GRM, posdef = nothing)
+        return (GRM = GRM, posdef = nothing)
     end
 end

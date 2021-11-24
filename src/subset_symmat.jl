@@ -18,7 +18,7 @@ consists of a named tuple with elements:
     `retain` in order to subset
 - `retain`: Either a vector of integers specifying which rows/columns of the input
     matrix to retain, or else a vector of strings specifying which entries from
-    `
+    axes_entries should be retained in the output matrix
 """
 function subset_symmat(M; axes_entries = nothing, retain)
 
